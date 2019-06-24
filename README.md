@@ -15,7 +15,7 @@ A deployed website allowing users to search for NPS parks and retrieve informati
       * link to open map visualization
     * [displayInfo.html](displayInfo.html)
       * link that displays all information regarding user chosen park
-  * #### JavaScript + AJAX
+  * #### JavaScript + AJAX (XMLHttpRequest)
     * [index1.js](js/index1.html)
       * provides user with list of park names
     * [index2.js](js/index2.html)
