@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html>
+
+	<style>
+		body{
+	    	background-color: #81F781;
+	  	}
+		h1{
+		    display: inline;
+		    text-align: center;
+		}
+		ul{
+			list-style-type: none;
+			margin: 0;
+			padding: 0;
+			overflow: hidden;
+			background-color: #006400;
+			top: 0;
+		}
+
+		#menu{
+			float: left;
+		}
+
+		#menu a {
+			display: block;
+			color: white;
+			text-align: center;
+			padding: 14px 16px;
+			text-decoration: none;
+		}
+	</style>
+
+	<body>
+		<div class = "nav">
+			<header>
+				<img src="nps.png" alt="nps symbol">
+				<h1>National Park Service Information Kiosk!</h1>
+			</header> 
+
+			<ul>
+			  <li id ="menu" ><a href="#info">General Information</a></li>
+			  <li id ="menu" ><a href="#weather">Weather</a></li>
+			  <li id ="menu" ><a href="#alerts">Alerts</a></li>
+			  <li id ="menu" ><a href="#campgrounds">Campgrounds</a></li>
+			  <li id ="menu" ><a href="#visitor">Visitor Centers</a></li>
+			  <li id ="menu" ><a href="#articles">Related Articles</a></li>
+			  <li id ="menu" ><a href="#events">Events</a></li>
+			  <li id ="menu" ><a href="#people">Related People</a></li>
+			  <li id ="menu" ><a href="#places">Related Places</a></li>
+			  <li id ="menu" ><a href="#news">News Releases</a></li>
+			  <li id ="menu" ><a href="#lessons">Related Lesson Plans</a></li>
+			</ul>
+		</div>
+
+		<div id="info"></div>
+
+
+		 <script>
+		 	// retrive park code that user selected
+		 	var code = sessionStorage.getItem("parkCode")
+		  	code = code.slice(1, code.length-1)
+
+
+		  	// receive general information
+			var ourRequest = new XMLHttpRequest();
+		  	ourRequest.open('GET', 'https://developer.nps.gov/api/v1/parks?parkCode='+code+'&api_key=4wRBdtDHPdue1L2T9USMQ7YDGm5Q9jBj4aCqu1dY', true);
+		  	ourRequest.onload = function() {
+		  		if(ourRequest.status != 200){
+      				alert(ourRequest.status+" Response Error!")
+    			}
+			    var ourData = JSON.parse(ourRequest.responseText);
+			    render(ourData);    
+			};
+			ourRequest.send();
+
+			function render(myData){
+			  	var infoString = ""
+			  	var dirString = ""
+			  	var weathString = ""
+			  	var infoContainer = document.getElementById("info");
+			  	var dirContainer = document.getElementById("directions");
+			  	var weathContainer = document.getElementById("weather");
+			  	var mapContainer = document.getElementById("map");
+
+				
+
+			    infoString += "<h2> | "+myData.data[0].fullName+", "+myData.data[0].states+" | </h2>"
+			   	infoString += "<p>"+"<a href=\""+myData.data[0].url+"\"> Park's NPS page</a> </p>"
+			   	infoString += "<p>"+myData.data[0].designation+"</p>"
+			   	infoString += "<p>"+myData.data[0].description+"</p>"
+			    dirString += "<p>"+"<a href=\""+myData.data[0].directionsUrl+"\">Directions</a></p>"
+			   	dirString += "<p>"+myData.data[0].directionsInfo+"</p>"
+			    weathString += "<p>"+myData.data[0].weatherInfo+"</p>"
+			
+
+				var latLong = myData.data[0].latLong
+				var split1 = latLong.split(",")
+				var latSplit = split1[0].split(":")
+				var longSplit = split1[1].split(":")
+				var lat = parseFloat(latSplit[1])
+				var long = parseFloat(longSplit[1])
+
+				localStorage.setItem("lat", lat)
+				localStorage.setItem("long", long)
+
+				infoContainer.insertAdjacentHTML('beforeend', infoString);
+				dirContainer.insertAdjacentHTML('beforeend', dirString);
+				weathContainer.insertAdjacentHTML('beforeend', weathString);
+			}
+
+			// receive alert information
+			var alertReq = new XMLHttpRequest();
+			alertReq.open('GET', 'https://developer.nps.gov/api/v1/alerts?parkCode='+code+'&api_key=4wRBdtDHPdue1L2T9USMQ7YDGm5Q9jBj4aCqu1dY', true);
+
+		  	alertReq.onload = function() {
+		  		if(alertReq.status != 200){
+      				alert(alertReq.status+" Response Error!")
+    			}		  		
+			    var data = JSON.parse(alertReq.responseText);
+			    alertRender(data);  
+			};
+			
+			alertReq.send();
+
+			function alertRender(myData){
+				var string = ""
+				var container = document.getElementById("alerts");
+
+				if(myData.total != 0){
+					for (i = 0; i < myData.data.length; i++) {
+						if(myData.data[i].url != "")
+							string += "<li>"+"<a href=\""+myData.data[i].url+"\">"+myData.data[i].title+"</a></li>"
+						else
+							string += "<li> <b> "+myData.data[i].title+"</b> </li>"
+						string += "<p>"+myData.data[i].description+"</p>"
+					}
+				}
+				else{
+					string+= "There are no alerts for this park."
+				}
+
+				container.insertAdjacentHTML('beforeend', string)
+			}
+
+			// receive visitor center information
+			var visitorReq = new XMLHttpRequest();
+		  	visitorReq.open('GET', 'https://developer.nps.gov/api/v1/visitorcenters?parkCode='+code+'&api_key=4wRBdtDHPdue1L2T9USMQ7YDGm5Q9jBj4aCqu1dY');
+		  	visitorReq.onload = function() {
+		  		if(visitorReq.status != 200){
+      				alert(visitorReq.status+" Response Error!")
+    			}	
+			    var data = JSON.parse(visitorReq.responseText);
+			    visitRend(data);    
+			};
+			visitorReq.send();
+
+			function visitRend(myData){
+				var stringHTML = ""
+				var visitContainer = document.getElementById("visitor");
+
+				if(myData.total != 0){
+					for (i = 0; i < myData.data.length; i++) {
+						stringHTML += "<p><li><b> "+myData.data[i].name+"</b> </li>"
+						stringHTML += "<p>"+myData.data[i].description+"</p>"
+						stringHTML += "<p>Directions: "+myData.data[i].directionsInfo+"</p>"
+						if(myData.data[i].url != "")
+							stringHTML += "<a href=\""+myData.data[i].url+"\">"+" Click here for more info"+"</a></p>"
+					}
+				}
+				else{
+					stringHTML += "There is no visitor center information for this park."
+				}
+
+				visitContainer.insertAdjacentHTML('beforeend', stringHTML)
+			}
+
+
+			// receive camground information
+			var campgroundReq = new XMLHttpRequest();
+		  	campgroundReq.open('GET', 'https://developer.nps.gov/api/v1/campgrounds?parkCode='+code+'&api_key=4wRBdtDHPdue1L2T9USMQ7YDGm5Q9jBj4aCqu1dY');
+		  	campgroundReq.onload = function() {
+		  		if(campgroundReq.status != 200){
+      				alert(campgroundReq.status+" Response Error!")
+    			}			  		
+			    var data = JSON.parse(campgroundReq.responseText);
+			    campRender(data);    
+			};
+			campgroundReq.send();
+
+			function campRender(myData){
+				var string = ""
+				var container = document.getElementById("campgrounds");
+
+				if(myData.total != 0){
+					for (i = 0; i < myData.data.length; i++) {
+						string += "<p><p> <b> "+myData.data[i].name+"</b> :</p>"
+						string += "<p>"+myData.data[i].description+"</p>"
+						if(myData.data[i].directionsUrl != "")
+							string += "<a href=\""+myData.data[i].directionsUrl+"\">"+" Click here for directions"+"</a></p>"
+					}
+				}
+				else{
+					string += "There are no campgrounds for this park."
+				}
+
+				container.insertAdjacentHTML('beforeend', string)
+			}
+
+
+			// receieve article information
+			var articleReq = new XMLHttpRequest();
+		  	articleReq.open('GET', 'https://developer.nps.gov/api/v1/articles?parkCode='+code+'&api_key=4wRBdtDHPdue1L2T9USMQ7YDGm5Q9jBj4aCqu1dY');
+		  	articleReq.onload = function() {
+	  			if(articleReq.status != 200){
+      				alert(articleReq.status+" Response Error!")
+    			}			  		
+			    var data = JSON.parse(articleReq.responseText);
+			    articleRender(data);    
+			};
+			articleReq.send();
+
+			function articleRender(myData){
+				var string = ""
+				var container = document.getElementById("articles");
+
+				if(myData.total != 0){
+					for (i = 0; i < myData.data.length; i++) {
+						if(myData.data[i].directionsUrl != "")
+							string += "<p> <li><a href=\""+myData.data[i].url+"\">" +myData.data[i].title+"</a></li></p>"
+						else
+							string += "<p>" + myData.data[i].url+ "</p>"
+						string += "<p>"+myData.data[i].listingdescription+"</p>"
+						if(myData.data[i].listingimage.length != 0){
+							string += "<img src=\""+myData.data[i].listingimage.url+"\" alt=\""+myData.data[i].listingimage.altText+"\" height=\"200\" width=\"200\">"
+						}
+					}
+				}
+				else{
+					string += "There are no articles for this park."
+				}
+
+				container.insertAdjacentHTML('beforeend', string)
+			}	
+
+			// receieve events information
+			var eventReq = new XMLHttpRequest();
+		  	eventReq.open('GET', 'https://developer.nps.gov/api/v1/events?parkCode='+code+'&api_key=4wRBdtDHPdue1L2T9USMQ7YDGm5Q9jBj4aCqu1dY');
+		  	eventReq.onload = function() {
+	  			if(eventReq.status != 200){
+      				alert(eventReq.status+" Response Error!")
+    			}		  		
+			    var data = JSON.parse(eventReq.responseText);
+			    eventRend(data);    
+			};
+			eventReq.send();
+
+			function eventRend(myData){
+				var string = ""
+				var container = document.getElementById("events");
+
+				if(myData.data.length != 0){
+					for (i = 0; i < myData.data.length; i++) {
+						string += "<p><li> <b> "+myData.data[i].title+" </b> </li></p>"
+						string += "<p> <b> Dates </b> : "+myData.data[i].datestart+" - "+myData.data[i].datestart+"</p>"
+						string += "<p> <b> Time </b> : "+myData.data[i].times[0].timestart+" - "+myData.data[i].times[0].timeend+"</p>"
+						string += "<p> <b> Location </b> : "+myData.data[i].location+"</p>"
+						string += "<p>"+myData.data[i].description+"</p>"
+					}
+				}
+				else{
+					string += "There are no events for this park."
+				}
+
+				container.insertAdjacentHTML('beforeend', string)
+			}	
+
+
+			// receive people information
+			var peopleReq = new XMLHttpRequest();
+		  	peopleReq.open('GET', 'https://developer.nps.gov/api/v1/people?parkCode='+code+'&api_key=4wRBdtDHPdue1L2T9USMQ7YDGm5Q9jBj4aCqu1dY');
+		  	peopleReq.onload = function() {
+	  			if(peopleReq.status != 200){
+      				alert(peopleReq.status+" Response Error!")
+    			}		  		
+			    var data = JSON.parse(peopleReq.responseText);
+			    peopleRend(data);    
+			};
+			peopleReq.send();
+
+			function peopleRend(myData){
+				var string = ""
+				var container = document.getElementById("people");
+
+				if(myData.data.length != 0){
+					for (i = 0; i < myData.data.length; i++) {
+						if(myData.data[i].url != "")
+							string += "<li><a href=\""+myData.data[i].url+"\"> "+myData.data[i].title+"</a></li>"
+						else
+							string += "<li>"+myData.data[i].title+"</li>"
+						string += "<p>"+myData.data[i].listingdescription+"</p>"
+						if(myData.data[i].listingimage.length != 0){
+							string += "<img src=\""+myData.data[i].listingimage.url+"\" alt=\""+myData.data[i].listingimage.altText+"\" height=\"200\" width=\"200\">"
+						}
+					}
+				}
+				else{
+					string += "There are no people associated with this park."
+				}
+
+				container.insertAdjacentHTML('beforeend', string)
+			}	
+
+			// receive places information
+			var placesReq = new XMLHttpRequest();
+		  	placesReq.open('GET', 'https://developer.nps.gov/api/v1/places?parkCode='+code+'&api_key=4wRBdtDHPdue1L2T9USMQ7YDGm5Q9jBj4aCqu1dY');
+		  	placesReq.onload = function() {
+	  			if(placesReq.status != 200){
+      				alert(placesReq.status+" Response Error!")
+    			}			  		
+			    var data = JSON.parse(placesReq.responseText);
+			    placesRend(data);    
+			};
+			placesReq.send();
+
+			function placesRend(myData){
+				var string = ""
+				var container = document.getElementById("places");
+
+				if(myData.data.length != 0){
+					for (i = 0; i < myData.data.length; i++) {
+						if(myData.data[i].url != "")
+							string += "<li><a href=\""+myData.data[i].url+"\"> "+myData.data[i].title+"</a></li>"
+						else
+							string += "<li>"+myData.data[i].title+"</li>"
+						string += "<p>"+myData.data[i].listingdescription+"</p>"
+						if(myData.data[i].listingimage.length != 0){
+							string += "<img src=\""+myData.data[i].listingimage.url+"\" alt=\""+myData.data[i].listingimage.altText+"\" height=\"200\" width=\"200\">"
+						}
+					}
+				}
+				else{
+					string += "There are no places associated with this park."
+				}
+
+				container.insertAdjacentHTML('beforeend', string)
+			}		
+
+
+			// receive new release information
+			var newsReq = new XMLHttpRequest();
+		  	newsReq.open('GET', 'https://developer.nps.gov/api/v1/newsreleases?parkCode='+code+'&api_key=4wRBdtDHPdue1L2T9USMQ7YDGm5Q9jBj4aCqu1dY');
+		  	newsReq.onload = function() {
+	  			if(newsReq.status != 200){
+      				alert(newsReq.status+" Response Error!")
+    			}		  		
+			    var data = JSON.parse(newsReq.responseText);
+			    newsRend(data);    
+			};
+			newsReq.send();
+
+			function newsRend(myData){
+				var string = ""
+				var container = document.getElementById("news");
+
+				if(myData.data.length != 0){
+					for (i = 0; i < myData.data.length; i++) {
+						if(myData.data[i].url != "")
+							string += "<li><a href=\""+myData.data[i].url+"\"> "+myData.data[i].title+"</a></li>"
+						else
+							string += "<li>"+myData.data[i].title+"</li>"
+						string += "<p>"+myData.data[i].abstract+"</p>"
+					}
+				}
+				else{
+					string += "There are no news releases related with this park."
+				}
+
+				container.insertAdjacentHTML('beforeend', string)
+			}
+
+			// receive lesson plan information
+			var lessonReq = new XMLHttpRequest();
+		  	lessonReq.open('GET', 'https://developer.nps.gov/api/v1/lessonplans?parkCode='+code+'&api_key=4wRBdtDHPdue1L2T9USMQ7YDGm5Q9jBj4aCqu1dY');
+		  	lessonReq.onload = function() {
+		  		if(lessonReq.status != 200){
+      				alert(lessonReq.status+" Response Error!")
+    			}		  		
+			    var data = JSON.parse(lessonReq.responseText);
+			    lessonRend(data);    
+			};
+			lessonReq.send();
+
+			function lessonRend(myData){
+				var string = ""
+				var container = document.getElementById("lessons");
+
+				if(myData.data.length != 0){
+					for (i = 0; i < myData.data.length; i++) {
+						string += "<li><a href=\""+myData.data[i].url+"\"> "+myData.data[i].title+"</a></li>"
+						string += "<p> <b> Duration </b> : "+myData.data[i].duration+"</p>"
+						string += "<p> <b> Subject </b> : "+myData.data[i].subject+"</p>"
+						string += "<p> <b> Grade Level </b>: "+myData.data[i].gradelevel+"</p>"
+						string += "<p> <b> Objective </b> : "+myData.data[i].questionobjective+"</p>"
+					}
+				}
+				else{
+					string += "There are no lesson plans associated with this park."
+				}
+
+				container.insertAdjacentHTML('beforeend', string)
+			}
+		  </script>
+
+		  <hr>
+
+		  
+		<div id="directions">
+		 	<h3>Directions:</h3>
+		  	<p><a href="map.html">View the park on Google Maps!</a></p>
+		  	<p><div id="insert"></div></p>
+		 </div>
+
+
+		<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false&v=3&libraries=geometry"></script>
+
+
+		<script>
+			function distance() {
+				var lat = localStorage.getItem("lat")
+				var lng = localStorage.getItem("long")
+				var location = new google.maps.LatLng(lat, lng)
+				var myContainer = document.getElementById("insert");
+				navigator.geolocation.getCurrentPosition(
+					function(position){
+				    	var current = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
+				    	var distance = google.maps.geometry.spherical.computeDistanceBetween(current, location);
+				    	myContainer.insertAdjacentHTML('beforeend', "This park is "+(distance/1609.34)+" miles away from your current location.")
+				}
+				);
+			}
+		</script>
+
+		<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAaWYkIl9dHGrRIWsFlelmhYoe_CkDn_lU&callback=distance"></script> 
+
+		<hr>
+
+		<div id="weather"> <h3>Weather:</h3> </div>
+
+		<hr>
+
+		<div id="alerts"> <h3>Alerts:</h3> </div>
+
+		<hr>
+
+		<div id="campgrounds">  <h3>Campgrounds:</h3> </div>
+
+		<hr>
+		 
+		<div id="visitor">  <h3>Vistor Centers:</h3> </div>
+
+		<hr>
+		  
+		<div id="articles"> <h3>Related Articles:</h3> </div>
+
+		<hr>
+
+		<div id="events">  <h3>Events:</h3> </div>
+
+		<hr>
+
+		<div id="people"> <h3>Related People:</h3> </div>
+
+		<hr>
+
+		<div id="places"> <h3>Related Places:</h3> </div>
+
+		<hr>
+		    
+		<div id="news"> <h3>News Releases:</h3> </div>
+
+		<hr>
+		 
+		<div id="lessons"> <h3>Related Lesson Plans:</h3> </div>
+
+		<hr>
+     
+	</body>
+</html>

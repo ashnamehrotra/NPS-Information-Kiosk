@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+  <style>
+    body{
+      background-color: #81F781;
+    }
+
+    #map{
+      height: 800px;  
+      width: 100%; 
+    }
+
+    h1{
+      display: inline;
+      text-align: center;
+    }
+  </style>
+
+
+  <body>
+        <header>
+            <img src="nps.png" alt="nps symbol">
+            <h1>National Park Service Information Kiosk!</h1>
+        </header> 
+
+        <h2>Park Location:</h2>
+
+        <div id="map"></div>
+
+        <script>
+            function initMap() {
+                var lat = localStorage.getItem("lat")
+                var lng = localStorage.getItem("long")
+
+                var location = new google.maps.LatLng(lat, lng)
+
+                var map = new google.maps.Map(
+                    document.getElementById('map'), {zoom: 10, center: location});
+                var marker = new google.maps.Marker({position: location, map: map});
+            }
+        </script>
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAaWYkIl9dHGrRIWsFlelmhYoe_CkDn_lU&callback=initMap"> </script>
+
+  </body>
+</html>
