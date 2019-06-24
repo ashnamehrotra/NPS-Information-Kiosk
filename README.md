@@ -5,6 +5,8 @@ Submission for Capital One Software Engineering Summit.
 
 A deployed website allowing users to search for NPS parks and retrieve information regarding them.
 
+(please allow time for API to load information)
+
 [Preview Website](https://ashnamehrotra.github.io/)
 
 ## Outline:
