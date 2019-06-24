@@ -8,6 +8,13 @@ A deployed website allowing users to search for NPS parks and retrieve informati
 [Preview Website](https://ashnamehrotra.github.io/)
 
 ## Outline:
+  * #### HTML/CSS
+    * [index.html](index.html)
+      * home page for user to search for a park name through state and designation filtering, name and keyword search
+    * [map.html](map.html)
+      * link to open map visualization
+    * [displayInfo.html](displayInfo.html)
+      * link that displays all information regarding user chosen park
   * #### JavaScript + AJAX
     * [index1.js](js/index1.html)
       * provides user with list of park names
@@ -22,12 +29,5 @@ A deployed website allowing users to search for NPS parks and retrieve informati
   * #### NPS API
     * retrieved information to display
     * checked for null values & HTTP Requests
-  * #### HTML/CSS
-    * [index.html](index.html)
-      * home page for user to search for a park name through state and designation filtering, name and keyword search
-    * [map.html](map.html)
-      * link to open map visualization
-    * [displayInfo.html](displayInfo.html)
-      * link that displays all information regarding user chosen park
   * #### Deployed on Github
   
