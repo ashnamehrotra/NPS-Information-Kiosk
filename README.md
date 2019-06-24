@@ -7,7 +7,7 @@ A deployed website allowing users to search for NPS parks and retrieve informati
 
 (please allow time for API to load information)
 
-[Preview Website](https://ashnamehrotra.github.io/)
+[Preview Website!](https://ashnamehrotra.github.io/)
 
 ## Outline:
   * #### HTML/CSS
