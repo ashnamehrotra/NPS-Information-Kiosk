@@ -28,6 +28,6 @@ A deployed website allowing users to search for NPS parks and retrieve informati
     * previewed park location on map & calculated distance from current location
   * #### NPS API
     * retrieved information to display
-    * checked for null values & HTTP Requests
+    * checked for null values & HTTP Request Status Code
   * #### Deployed on Github
   
